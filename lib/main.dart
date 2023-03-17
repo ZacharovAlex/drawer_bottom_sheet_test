@@ -76,7 +76,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           WidgetContent(content: 'Photo'),
           WidgetContent(content: 'Chat'),
           WidgetContent(content: 'Album'),
-          // for (String content in contentList) WidgetStack(content: content)
         ],
       ),
       drawer: const LeftDrawer(),
@@ -166,19 +165,19 @@ class LeftDrawer extends StatelessWidget {
             backgroundColor: Colors.blue,
           )),
           const ListTile(
+            title: Text('Home'),
+            leading: Icon(Icons.home),
+            trailing: Icon(Icons.arrow_forward_ios),
+          ),
+          const ListTile(
             title: Text('Profile'),
-            leading: Icon(Icons.add_card_outlined),
-            trailing: Icon(Icons.add_card_outlined),
+            leading: Icon(Icons.photo_camera_front),
+            trailing: Icon(Icons.arrow_forward_ios),
           ),
           const ListTile(
             title: Text('Images'),
-            leading: Icon(Icons.add_card_outlined),
-            trailing: Icon(Icons.add_card_outlined),
-          ),
-          const ListTile(
-            title: Text('Files'),
-            leading: Icon(Icons.add_card_outlined),
-            trailing: Icon(Icons.add_card_outlined),
+            leading: Icon(Icons.image),
+            trailing: Icon(Icons.arrow_forward_ios),
           ),
           const Spacer(),
           Padding(
