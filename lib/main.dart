@@ -1,6 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbox_5/show_modal.dart';
+
+import 'main_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,82 +14,47 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD MAIN APP');
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: BlocProvider(
+          create: (_) => CounterCubit(),child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  late TabController _tabController;
-  int _screenIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      initialIndex: 0,
-      length: 3,
-      vsync: this,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    _tabController.addListener(() {
-      _screenIndex = _tabController.index;
-      setState(() {});
-    });
-    super.didChangeDependencies();
-  }
-
-  void changeTab(int index) {
-    _screenIndex = index;
-    _tabController.index = index;
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
+    print('BUILD MAIN PAGE!');
     return Scaffold(
       appBar: AppBar(
         actions: const [
           BuilderAppBar(),
         ],
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        physics: const BouncingScrollPhysics(),
-        dragStartBehavior: DragStartBehavior.down,
-        children: const [
-          WidgetContent(content: 'Photo'),
-          WidgetContent(content: 'Chat'),
-          WidgetContent(content: 'Album'),
-        ],
-      ),
+      body: BlocBuilder<CounterCubit, int>(
+        builder: (context, state) {return ScreensBuilder(screenIndex: state,);},),
       drawer: const LeftDrawer(),
       endDrawer: const RightDrawer(),
       floatingActionButton: const FloatingButton(),
       bottomNavigationBar:
-          BottomNavigationBar(onTap: (index) => changeTab(index), currentIndex: _screenIndex, items: const [
-        BottomNavigationBarItem(label: 'Photo', icon: Icon(Icons.home)),
-        BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat)),
-        BottomNavigationBarItem(label: 'Albums', icon: Icon(Icons.album)),
-      ]),
+          BlocBuilder<CounterCubit,int>(
+            builder: (context, state) {
+              return BottomNavigationBar(onTap: (index) => context.read<CounterCubit>().changeScreen(index), currentIndex: state, items: const [
+                BottomNavigationBarItem(label: 'Photo', icon: Icon(Icons.home)),
+                BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat)),
+                BottomNavigationBarItem(label: 'Albums', icon: Icon(Icons.album)),
+              ]);
+            },
+          ),
     );
   }
 }
@@ -98,6 +66,7 @@ class BuilderAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD APPBAR');
     return Builder(
       builder: (context) => IconButton(
         icon: const Icon(Icons.photo_camera_front_outlined),
@@ -115,6 +84,7 @@ class FloatingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD Floating buttton!');
     return FloatingActionButton(
       onPressed: () => showModal(context),
       child: const Icon(Icons.add),
@@ -129,6 +99,7 @@ class RightDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD RIght Drawer!');
     return Drawer(
         child: Center(
       child: Column(
@@ -156,6 +127,7 @@ class LeftDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD LEFT DRAWER');
     return Drawer(
       child: Column(
         children: [
@@ -211,8 +183,57 @@ class WidgetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD Screen content!');
     return Center(
       child: Text(content),
     );
   }
 }
+
+
+class ScreensBuilder extends StatefulWidget {
+  final int screenIndex;
+  const ScreensBuilder({Key? key, required this.screenIndex}) : super(key: key);
+
+  @override
+  State<ScreensBuilder> createState() => _ScreensBuilderState();
+}
+
+class _ScreensBuilderState extends State<ScreensBuilder> with TickerProviderStateMixin {
+  late TabController _tabController;
+//  int _screenIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      initialIndex: 0,
+      length: 3,
+      vsync: this,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    _tabController.addListener(() {
+      context.read<CounterCubit>().changeScreen(_tabController.index);
+    });
+    super.didChangeDependencies();
+  }
+  @override
+  Widget build(BuildContext context) {
+    print('BUILD Screen!');
+    _tabController.index=widget.screenIndex;
+    return TabBarView(
+      controller: _tabController,
+      physics: const BouncingScrollPhysics(),
+      dragStartBehavior: DragStartBehavior.down,
+      children: const [
+        WidgetContent(content: 'Photo'),
+        WidgetContent(content: 'Chat'),
+        WidgetContent(content: 'Album'),
+      ],
+    );
+  }
+}
+
