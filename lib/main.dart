@@ -21,15 +21,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: BlocProvider(
-          create: (_) => CounterCubit(),child: const MyHomePage(title: 'Flutter Demo Home Page')),
+          create: (_) => CounterCubit(), child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
+  final String title;
+
   const MyHomePage({super.key, required this.title});
 
-  final String title;
   @override
   Widget build(BuildContext context) {
     print('BUILD MAIN PAGE!');
@@ -41,20 +42,27 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       body: BlocBuilder<CounterCubit, int>(
-        builder: (context, state) {return ScreensBuilder(screenIndex: state,);},),
+        builder: (context, state) {
+          return ScreensBuilder(
+            screenIndex: state,
+          );
+        },
+      ),
       drawer: const LeftDrawer(),
       endDrawer: const RightDrawer(),
       floatingActionButton: const FloatingButton(),
-      bottomNavigationBar:
-          BlocBuilder<CounterCubit,int>(
-            builder: (context, state) {
-              return BottomNavigationBar(onTap: (index) => context.read<CounterCubit>().changeScreen(index), currentIndex: state, items: const [
+      bottomNavigationBar: BlocBuilder<CounterCubit, int>(
+        builder: (context, state) {
+          return BottomNavigationBar(
+              onTap: (index) => context.read<CounterCubit>().changeScreen(index),
+              currentIndex: state,
+              items: const [
                 BottomNavigationBarItem(label: 'Photo', icon: Icon(Icons.home)),
                 BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat)),
                 BottomNavigationBarItem(label: 'Albums', icon: Icon(Icons.album)),
               ]);
-            },
-          ),
+        },
+      ),
     );
   }
 }
@@ -190,9 +198,9 @@ class WidgetContent extends StatelessWidget {
   }
 }
 
-
 class ScreensBuilder extends StatefulWidget {
   final int screenIndex;
+
   const ScreensBuilder({Key? key, required this.screenIndex}) : super(key: key);
 
   @override
@@ -201,7 +209,6 @@ class ScreensBuilder extends StatefulWidget {
 
 class _ScreensBuilderState extends State<ScreensBuilder> with TickerProviderStateMixin {
   late TabController _tabController;
-//  int _screenIndex = 0;
 
   @override
   void initState() {
@@ -220,10 +227,17 @@ class _ScreensBuilderState extends State<ScreensBuilder> with TickerProviderStat
     });
     super.didChangeDependencies();
   }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     print('BUILD Screen!');
-    _tabController.index=widget.screenIndex;
+    _tabController.index = widget.screenIndex;
     return TabBarView(
       controller: _tabController,
       physics: const BouncingScrollPhysics(),
@@ -236,4 +250,3 @@ class _ScreensBuilderState extends State<ScreensBuilder> with TickerProviderStat
     );
   }
 }
-

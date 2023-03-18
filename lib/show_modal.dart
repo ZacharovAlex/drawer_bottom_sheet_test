@@ -8,10 +8,15 @@ Future<T?> showModal<T>(BuildContext context) {
       context: context,
       builder: (context) {
         return SizedBox(
-          height: MediaQuery.of(context).size.height/2,
-          child:  Center(
-            child: ElevatedButton(onPressed: () { Navigator.pop(context); },
-              child: const Text('CLOSE MODAL'),),
-          ),);
+          height: MediaQuery.of(context).size.height / 2,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('CLOSE MODAL'),
+            ),
+          ),
+        );
       });
 }
